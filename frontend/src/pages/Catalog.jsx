@@ -1,154 +1,329 @@
-import React, { useState, useEffect } from 'react';
-import CourseCard from '../components/Course/CourseCard';
-import { Search, Filter, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import {
+  Search, Filter, BookOpen, Star, Users, X,
+  ShoppingCart, CheckCircle, SlidersHorizontal, ChevronRight
+} from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// — Mock courses for demo —
+const ALL_COURSES = [
+  { _id: '1', title: 'React & Node.js: Full Stack desde Cero', instructor: 'Carlos Méndez', price: 49.99, rating: 4.9, students: 3241, category: 'Desarrollo Web', level: 'Intermedio', color: 'from-indigo-900 to-purple-900', duration: '42h', lessons: 120 },
+  { _id: '2', title: 'Python para Data Science e Inteligencia Artificial', instructor: 'Ana Rodríguez', price: 59.99, rating: 4.8, students: 2187, category: 'Data Science', level: 'Principiante', color: 'from-cyan-900 to-blue-900', duration: '38h', lessons: 95 },
+  { _id: '3', title: 'UI/UX Design: De Wireframe a Prototipo', instructor: 'Luis García', price: 39.99, rating: 4.7, students: 1854, category: 'Diseño', level: 'Principiante', color: 'from-rose-900 to-pink-900', duration: '28h', lessons: 76 },
+  { _id: '4', title: 'DevOps & Cloud con AWS y Docker', instructor: 'Miguel Torres', price: 69.99, rating: 4.9, students: 1122, category: 'DevOps', level: 'Avanzado', color: 'from-orange-900 to-amber-900', duration: '55h', lessons: 145 },
+  { _id: '5', title: 'Marketing Digital y Growth Hacking', instructor: 'Sofía Lima', price: 34.99, rating: 4.6, students: 4320, category: 'Marketing', level: 'Principiante', color: 'from-green-900 to-emerald-900', duration: '22h', lessons: 58 },
+  { _id: '6', title: 'JavaScript Moderno: ES6+ y TypeScript', instructor: 'Daniel Cruz', price: 44.99, rating: 4.8, students: 2890, category: 'Desarrollo Web', level: 'Intermedio', color: 'from-yellow-900 to-orange-900', duration: '35h', lessons: 88 },
+  { _id: '7', title: 'Machine Learning con TensorFlow', instructor: 'Patricia Vargas', price: 74.99, rating: 4.9, students: 980, category: 'Data Science', level: 'Avanzado', color: 'from-teal-900 to-cyan-900', duration: '60h', lessons: 160 },
+  { _id: '8', title: 'Finanzas Personales e Inversiones', instructor: 'Roberto Soto', price: 29.99, rating: 4.7, students: 5100, category: 'Finanzas', level: 'Principiante', color: 'from-lime-900 to-green-900', duration: '18h', lessons: 48 },
+  { _id: '9', title: 'Fotografía Profesional con Smartphone', instructor: 'Elena Ruiz', price: 24.99, rating: 4.5, students: 3670, category: 'Arte y Creatividad', level: 'Principiante', color: 'from-fuchsia-900 to-purple-900', duration: '15h', lessons: 40 },
+  { _id: '10', title: 'Kubernetes y Microservicios en Producción', instructor: 'Javier Mora', price: 79.99, rating: 4.9, students: 730, category: 'DevOps', level: 'Avanzado', color: 'from-sky-900 to-blue-900', duration: '50h', lessons: 130 },
+  { _id: '11', title: 'Diseño Gráfico con Figma', instructor: 'Camila Flores', price: 32.99, rating: 4.6, students: 2200, category: 'Diseño', level: 'Principiante', color: 'from-pink-900 to-rose-900', duration: '24h', lessons: 65 },
+  { _id: '12', title: 'SEO Avanzado: Domina Google en 2026', instructor: 'Andrés Leal', price: 44.99, rating: 4.7, students: 1890, category: 'Marketing', level: 'Intermedio', color: 'from-violet-900 to-indigo-900', duration: '30h', lessons: 80 },
+];
 
-export default function Catalog() {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Filter states
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
-  const [level, setLevel] = useState('');
+const CATEGORIES = ['Todos', 'Desarrollo Web', 'Data Science', 'Diseño', 'DevOps', 'Marketing', 'Finanzas', 'Arte y Creatividad'];
+const LEVELS = ['Todos', 'Principiante', 'Intermedio', 'Avanzado'];
+const SORT_OPTIONS = [
+  { value: 'popular', label: 'Más populares' },
+  { value: 'rating', label: 'Mejor valorados' },
+  { value: 'price_asc', label: 'Precio: menor a mayor' },
+  { value: 'price_desc', label: 'Precio: mayor a menor' },
+  { value: 'newest', label: 'Más nuevos' },
+];
 
-  const fetchCourses = async () => {
-    setLoading(true);
-    try {
-      let queryParams = new URLSearchParams();
-      if (category) queryParams.append('category', category);
-      if (level) queryParams.append('level', level);
-      if (search) queryParams.append('search', search);
-      queryParams.append('publishedOnly', 'true');
+function StarRating({ rating }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star key={s} className={`w-3 h-3 ${s <= Math.round(rating) ? 'star-filled fill-amber-400' : 'star-empty'}`} />
+      ))}
+    </div>
+  );
+}
 
-      const res = await fetch(`${API_URL}/courses?${queryParams.toString()}`);
-      const data = await res.json();
-      if (data.success) {
-        setCourses(data.courses);
-      }
-    } catch (err) {
-      console.error('Error fetching catalog:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Re-fetch courses when filters change
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchCourses();
-    }, 300); // Debounce search input
-
-    return () => clearTimeout(delayDebounce);
-  }, [search, category, level]);
-
-  const handleResetFilters = () => {
-    setSearch('');
-    setCategory('');
-    setLevel('');
-  };
-
-  const categories = ['Inteligencia Artificial', 'Desarrollo Web', 'Programación'];
+function CourseCard({ course }) {
+  const { addToCart, isInCart } = useCart();
+  const inCart = isInCart(course._id);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-12">
-      
-      {/* Page Header */}
-      <div className="space-y-2 text-center md:text-left">
-        <h1 className="font-display font-extrabold text-4xl text-white">Catálogo de Cursos</h1>
-        <p className="text-slate-400 text-sm md:text-base max-w-xl">
-          Explora toda nuestra oferta educativa y comienza a capacitarte con el temario más moderno y estructurado.
-        </p>
-      </div>
+    <div className="glass-card rounded-2xl overflow-hidden flex flex-col group">
+      <Link to={`/courses/${course._id}`} className="block">
+        <div className={`course-thumb bg-gradient-to-br ${course.color} flex items-center justify-center`}>
+          <BookOpen className="w-10 h-10 text-white/20 group-hover:text-white/40 transition-all group-hover:scale-110" />
+          <div className="absolute top-3 left-3">
+            <span className="badge-primary">{course.category}</span>
+          </div>
+          <div className="absolute top-3 right-3">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              course.level === 'Principiante' ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : course.level === 'Intermedio' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+              : 'bg-red-500/20 text-red-400 border border-red-500/30'
+            }`}>{course.level}</span>
+          </div>
+        </div>
+      </Link>
 
-      {/* Filter Controls Row */}
-      <div className="glass-panel p-6 rounded-2xl grid grid-cols-1 md:grid-cols-12 gap-4 items-center border border-slate-800/80">
-        
-        {/* Search */}
-        <div className="md:col-span-5 relative">
-          <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-          <input
-            type="text"
-            placeholder="Buscar por título, palabra clave..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-          />
+      <div className="p-4 flex flex-col flex-1">
+        <Link to={`/courses/${course._id}`}>
+          <h3 className="font-display font-semibold text-white text-sm leading-snug mb-1.5 line-clamp-2 group-hover:text-indigo-300 transition-colors">
+            {course.title}
+          </h3>
+        </Link>
+        <p className="text-xs text-slate-500 mb-2">{course.instructor}</p>
+
+        <div className="flex items-center gap-1.5 mb-2">
+          <StarRating rating={course.rating} />
+          <span className="text-xs font-bold text-amber-400">{course.rating}</span>
+          <span className="text-xs text-slate-600">({course.students.toLocaleString()})</span>
         </div>
 
-        {/* Category Filter */}
-        <div className="md:col-span-3">
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
-          >
-            <option value="">Todas las Categorías</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-center gap-3 text-xs text-slate-500 mb-4">
+          <span>{course.duration}</span>
+          <span>·</span>
+          <span>{course.lessons} lecciones</span>
         </div>
 
-        {/* Level Filter */}
-        <div className="md:col-span-3">
-          <select
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
-          >
-            <option value="">Todos los Niveles</option>
-            <option value="beginner">Principiante</option>
-            <option value="intermediate">Intermedio</option>
-            <option value="advanced">Avanzado</option>
-          </select>
-        </div>
-
-        {/* Reset Filters button */}
-        <div className="md:col-span-1 flex justify-center">
+        <div className="mt-auto flex items-center justify-between">
+          <span className="text-xl font-bold text-white">${course.price}</span>
           <button
-            onClick={handleResetFilters}
-            className="p-3 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-all cursor-pointer"
-            title="Limpiar filtros"
+            onClick={() => addToCart(course)}
+            disabled={inCart}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              inCart
+                ? 'bg-green-500/10 text-green-400 border border-green-500/30'
+                : 'btn-gradient text-white'
+            }`}
           >
-            <RefreshCw className="w-5 h-5" />
+            {inCart ? (
+              <><CheckCircle className="w-3.5 h-3.5" /> En carrito</>
+            ) : (
+              <><ShoppingCart className="w-3.5 h-3.5" /> Agregar</>
+            )}
           </button>
         </div>
-
       </div>
+    </div>
+  );
+}
 
-      {/* Catalog Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="glass-panel h-96 rounded-2xl animate-pulse bg-slate-900/50"></div>
-          ))}
-        </div>
-      ) : courses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {courses.map((course) => (
-            <CourseCard key={course._id} course={course} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-20 glass-panel rounded-2xl border border-dashed border-slate-800/80">
-          <Filter className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-          <h3 className="font-display font-bold text-xl text-white mb-2">No se encontraron cursos</h3>
-          <p className="text-slate-500 text-sm max-w-xs mx-auto mb-6">
-            Intente ajustando sus filtros de búsqueda o categoría para encontrar lo que busca.
+export default function Catalog() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'Todos');
+  const [selectedLevel, setSelectedLevel] = useState('Todos');
+  const [sortBy, setSortBy] = useState('popular');
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState(100);
+
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) setSelectedCategory(cat);
+  }, [searchParams]);
+
+  const filtered = ALL_COURSES
+    .filter((c) => {
+      const matchSearch = c.title.toLowerCase().includes(search.toLowerCase()) ||
+        c.instructor.toLowerCase().includes(search.toLowerCase());
+      const matchCat = selectedCategory === 'Todos' || c.category === selectedCategory;
+      const matchLevel = selectedLevel === 'Todos' || c.level === selectedLevel;
+      const matchPrice = c.price <= priceRange;
+      return matchSearch && matchCat && matchLevel && matchPrice;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'popular') return b.students - a.students;
+      if (sortBy === 'rating') return b.rating - a.rating;
+      if (sortBy === 'price_asc') return a.price - b.price;
+      if (sortBy === 'price_desc') return b.price - a.price;
+      return 0;
+    });
+
+  const clearFilters = () => {
+    setSearch('');
+    setSelectedCategory('Todos');
+    setSelectedLevel('Todos');
+    setPriceRange(100);
+    setSortBy('popular');
+  };
+
+  const hasFilters = search || selectedCategory !== 'Todos' || selectedLevel !== 'Todos' || priceRange < 100;
+
+  return (
+    <div className="page-wrapper">
+      {/* Hero header */}
+      <div className="bg-[#050810] border-b border-white/5 py-12">
+        <div className="container-xl">
+          <h1 className="font-display font-bold text-3xl md:text-4xl text-white mb-3">
+            Catálogo de Cursos
+          </h1>
+          <p className="text-slate-400 mb-6">
+            {ALL_COURSES.length} cursos disponibles · Aprende de los mejores expertos
           </p>
-          <button
-            onClick={handleResetFilters}
-            className="btn-gradient text-white text-xs font-semibold px-4 py-2.5 rounded-lg"
-          >
-            Restablecer Filtros
-          </button>
-        </div>
-      )}
 
+          {/* Search bar */}
+          <div className="flex gap-3 max-w-2xl">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Buscar cursos, instructores..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input-field pl-10"
+              />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`btn-ghost px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 ${showFilters ? 'border-indigo-500/40 text-indigo-400' : ''}`}
+            >
+              <SlidersHorizontal className="w-4 h-4" /> Filtros
+              {hasFilters && <span className="w-2 h-2 bg-indigo-400 rounded-full"></span>}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-xl py-8">
+        <div className="flex gap-8">
+
+          {/* Sidebar filters — desktop */}
+          <aside className={`w-64 flex-shrink-0 hidden lg:block`}>
+            <div className="glass-panel rounded-2xl p-5 sticky top-24">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="font-display font-semibold text-white text-sm">Filtros</h3>
+                {hasFilters && (
+                  <button onClick={clearFilters} className="text-xs text-indigo-400 hover:underline">
+                    Limpiar
+                  </button>
+                )}
+              </div>
+
+              {/* Category */}
+              <div className="mb-6">
+                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Categoría</h4>
+                <div className="space-y-1">
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all cursor-pointer ${
+                        selectedCategory === cat
+                          ? 'text-indigo-400 bg-indigo-500/10 font-medium'
+                          : 'text-slate-400 hover:text-white hover:bg-white/4'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Level */}
+              <div className="mb-6">
+                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Nivel</h4>
+                <div className="space-y-1">
+                  {LEVELS.map((lvl) => (
+                    <button
+                      key={lvl}
+                      onClick={() => setSelectedLevel(lvl)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all cursor-pointer ${
+                        selectedLevel === lvl
+                          ? 'text-indigo-400 bg-indigo-500/10 font-medium'
+                          : 'text-slate-400 hover:text-white hover:bg-white/4'
+                      }`}
+                    >
+                      {lvl}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price */}
+              <div>
+                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                  Precio máx: <span className="text-white">${priceRange}</span>
+                </h4>
+                <input
+                  type="range" min="10" max="100" value={priceRange}
+                  onChange={(e) => setPriceRange(Number(e.target.value))}
+                  className="w-full accent-indigo-500 cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-slate-600 mt-1">
+                  <span>$10</span><span>$100</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            {/* Mobile filters */}
+            {showFilters && (
+              <div className="lg:hidden glass-panel rounded-2xl p-5 mb-6 animate-fade-in">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-xs font-semibold text-slate-400 mb-2">Categoría</h4>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="input-field text-xs"
+                    >
+                      {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-slate-400 mb-2">Nivel</h4>
+                    <select
+                      value={selectedLevel}
+                      onChange={(e) => setSelectedLevel(e.target.value)}
+                      className="input-field text-xs"
+                    >
+                      {LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Top bar */}
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-sm text-slate-400">
+                <span className="text-white font-semibold">{filtered.length}</span> cursos encontrados
+              </p>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="input-field w-auto text-sm py-2 px-3"
+              >
+                {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+
+            {/* Grid */}
+            {filtered.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                {filtered.map((course) => (
+                  <CourseCard key={course._id} course={course} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20">
+                <BookOpen className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                <h3 className="font-display font-semibold text-white mb-2">No se encontraron cursos</h3>
+                <p className="text-sm text-slate-500 mb-6">Intenta con otros filtros o términos de búsqueda.</p>
+                <button onClick={clearFilters} className="btn-outline px-5 py-2.5 rounded-xl text-sm font-medium">
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

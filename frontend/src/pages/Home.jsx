@@ -1,334 +1,319 @@
-import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
-import { getImageUrl } from '../components/Course/CourseCard';
-import StarRating from '../components/Common/StarRating';
-import { BrainCircuit, BookOpen, Award, Users, ChevronRight, ShoppingCart, CheckCircle, ArrowRight } from 'lucide-react';
+import {
+  BookOpen, ArrowRight, Star, Users, PlayCircle,
+  Zap, Shield, Award, TrendingUp, ChevronRight
+} from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// — Mock data —
+const FEATURED_COURSES = [
+  {
+    id: '1', title: 'React & Node.js: Full Stack desde Cero',
+    instructor: 'Carlos Méndez', price: 49.99, rating: 4.9, students: 3241,
+    category: 'Desarrollo Web', level: 'Intermedio',
+    color: 'from-indigo-900 to-purple-900',
+  },
+  {
+    id: '2', title: 'Python para Data Science e Inteligencia Artificial',
+    instructor: 'Ana Rodríguez', price: 59.99, rating: 4.8, students: 2187,
+    category: 'Data Science', level: 'Principiante',
+    color: 'from-cyan-900 to-blue-900',
+  },
+  {
+    id: '3', title: 'UI/UX Design: De Wireframe a Prototipo',
+    instructor: 'Luis García', price: 39.99, rating: 4.7, students: 1854,
+    category: 'Diseño', level: 'Principiante',
+    color: 'from-rose-900 to-pink-900',
+  },
+  {
+    id: '4', title: 'DevOps & Cloud con AWS y Docker',
+    instructor: 'Miguel Torres', price: 69.99, rating: 4.9, students: 1122,
+    category: 'DevOps', level: 'Avanzado',
+    color: 'from-orange-900 to-amber-900',
+  },
+];
+
+const STATS = [
+  { label: 'Estudiantes', value: '50K+', icon: Users },
+  { label: 'Cursos', value: '200+', icon: BookOpen },
+  { label: 'Instructores', value: '80+', icon: Award },
+  { label: 'Horas de contenido', value: '5,000+', icon: PlayCircle },
+];
+
+const FEATURES = [
+  { icon: Zap, title: 'Aprende a tu ritmo', desc: 'Acceso de por vida a todos los cursos. Estudia cuando y donde quieras sin fechas límite.' },
+  { icon: Shield, title: 'Garantía de calidad', desc: 'Todos los cursos son revisados por nuestro equipo editorial para asegurar el mejor contenido.' },
+  { icon: Award, title: 'Certificados reales', desc: 'Obtén certificados verificables al completar tus cursos y compártelos en LinkedIn.' },
+  { icon: TrendingUp, title: 'Contenido actualizado', desc: 'Los instructores actualizan continuamente el contenido para mantenerte al día con la industria.' },
+];
+
+const CATEGORIES = [
+  { name: 'Desarrollo Web', icon: '💻', count: 45 },
+  { name: 'Data Science', icon: '📊', count: 32 },
+  { name: 'Diseño UI/UX', icon: '🎨', count: 28 },
+  { name: 'Marketing Digital', icon: '📱', count: 24 },
+  { name: 'Finanzas', icon: '💰', count: 19 },
+  { name: 'DevOps & Cloud', icon: '☁️', count: 22 },
+];
+
+function StarRating({ rating }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1,2,3,4,5].map((s) => (
+        <Star
+          key={s}
+          className={`w-3.5 h-3.5 ${s <= Math.round(rating) ? 'star-filled fill-amber-400' : 'star-empty'}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+function CourseCard({ course }) {
+  return (
+    <Link to={`/courses/${course.id}`} className="glass-card rounded-2xl overflow-hidden block group">
+      <div className={`course-thumb bg-gradient-to-br ${course.color} flex items-center justify-center`}>
+        <BookOpen className="w-12 h-12 text-white/20 group-hover:text-white/40 transition-all group-hover:scale-110" />
+        <div className="absolute top-3 left-3">
+          <span className="badge-primary">{course.category}</span>
+        </div>
+        <div className="absolute top-3 right-3">
+          <span className="badge-warning">{course.level}</span>
+        </div>
+      </div>
+      <div className="p-5">
+        <h3 className="font-display font-semibold text-white text-sm leading-snug mb-2 line-clamp-2 group-hover:text-indigo-300 transition-colors">
+          {course.title}
+        </h3>
+        <p className="text-xs text-slate-500 mb-3">{course.instructor}</p>
+        <div className="flex items-center gap-2 mb-3">
+          <StarRating rating={course.rating} />
+          <span className="text-xs font-bold text-amber-400">{course.rating}</span>
+          <span className="text-xs text-slate-600">({course.students.toLocaleString()})</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-lg font-bold text-white">${course.price}</span>
+          <span className="text-xs text-slate-500 flex items-center gap-1">
+            <Users className="w-3.5 h-3.5" />{course.students.toLocaleString()} alumnos
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default function Home() {
-  const { user } = useAuth();
-  const { addToCart, isInCart } = useCart();
-  const [courses, setCourses] = useState([]);
-  const [featuredCourse, setFeaturedCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch(`${API_URL}/courses`);
-        const data = await res.json();
-        if (data.success) {
-          setCourses(data.courses);
-          // Find the Genetic Algorithms course as featured
-          const ga = data.courses.find((c) => c.title.toLowerCase().includes('genéticos'));
-          if (ga) {
-            setFeaturedCourse(ga);
-          } else if (data.courses.length > 0) {
-            setFeaturedCourse(data.courses[0]);
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching courses:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourses();
-  }, []);
-
-  const isEnrolled = (courseId) => {
-    return user?.enrolledCourses?.some(c => c._id === courseId || c === courseId);
-  };
-
   return (
-    <div className="space-y-24 pb-20 pt-20">
-      
-      {/* 1. Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-8">
-        {/* Neon Glow spots */}
-        <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -z-10"></div>
+    <div className="page-wrapper">
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          <span className="inline-flex items-center space-x-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-full text-xs font-semibold uppercase tracking-wider">
-            <BrainCircuit className="w-4 h-4 animate-spin-slow" />
-            <span>El futuro del aprendizaje digital</span>
-          </span>
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden py-24 md:py-36">
+        {/* Background glows */}
+        <div className="glow-orb w-[600px] h-[400px] bg-indigo-600/10 top-[-100px] left-[50%] translate-x-[-50%]" />
+        <div className="glow-orb w-[300px] h-[300px] bg-purple-600/10 bottom-0 right-0" />
 
-          <h1 className="font-display font-extrabold text-5xl md:text-7xl text-white tracking-tight leading-none max-w-4xl mx-auto">
-            Domina las Habilidades del <span className="text-gradient">Futuro Tecnológico</span>
+        <div className="container-xl relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 badge-primary mb-6 animate-fade-in-up">
+            <Zap className="w-3 h-3" /> La plataforma educativa del futuro
+          </div>
+
+          <h1 className="font-display font-extrabold text-4xl md:text-6xl lg:text-7xl text-white leading-[1.1] mb-6 animate-fade-in-up delay-100">
+            Aprende las habilidades<br />
+            <span className="gradient-text">que el mundo necesita</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Plataforma interactiva y especializada para adquirir conocimientos de nivel profesional en inteligencia artificial, desarrollo de software y optimización matemática.
+          <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 animate-fade-in-up delay-200">
+            Más de 200 cursos de alta calidad impartidos por expertos de la industria.
+            Certificados verificables. Aprende a tu propio ritmo.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-300">
             <Link
               to="/courses"
-              className="w-full sm:w-auto btn-gradient text-white font-semibold px-8 py-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg"
+              className="btn-gradient px-8 py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-base"
             >
-              <span>Explorar Cursos</span>
-              <ChevronRight className="w-5 h-5" />
+              Explorar Cursos <ArrowRight className="w-5 h-5" />
             </Link>
-            <a
-              href="#featured"
-              className="w-full sm:w-auto btn-gradient-secondary text-slate-300 font-semibold px-8 py-4 rounded-xl flex items-center justify-center"
+            <Link
+              to="/register"
+              className="btn-ghost px-8 py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 text-base"
             >
-              Ver Curso Destacado
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Platform Statistics */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { value: '15K+', label: 'Estudiantes Activos', icon: Users, color: 'text-blue-400' },
-            { value: '50+', label: 'Cursos Especializados', icon: BookOpen, color: 'text-indigo-400' },
-            { value: '98.5%', label: 'Tasa de Satisfacción', icon: Award, color: 'text-purple-400' },
-            { value: '10K+', label: 'Certificaciones Emitidas', icon: CheckCircle, color: 'text-emerald-400' },
-          ].map((stat, idx) => (
-            <div key={idx} className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center space-y-2">
-              <stat.icon className={`w-8 h-8 ${stat.color} mb-1`} />
-              <span className="font-display font-extrabold text-3xl text-white">{stat.value}</span>
-              <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. Featured Course Section */}
-      <section id="featured" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-2 mb-12">
-          <h2 className="font-display font-bold text-3xl md:text-4xl text-white">
-            Curso Destacado del Mes
-          </h2>
-          <p className="text-slate-400 text-sm max-w-lg mx-auto">
-            Nuestra recomendación principal para adentrarse en la optimización avanzada de inteligencias artificiales.
-          </p>
-        </div>
-
-        {loading ? (
-          <div className="glass-panel p-12 rounded-3xl flex justify-center items-center">
-            <div className="w-12 h-12 rounded-full border-4 border-slate-800 border-t-indigo-500 animate-spin"></div>
-          </div>
-        ) : featuredCourse ? (
-          <div className="glass-panel rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 border border-slate-800/80 shadow-2xl relative">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl -z-10"></div>
-            
-            {/* Visual Part */}
-            <div className="lg:col-span-5 relative aspect-video lg:aspect-auto bg-slate-900 overflow-hidden">
-              <img
-                src={getImageUrl(featuredCourse.thumbnail)}
-                alt={featuredCourse.title}
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/20 to-transparent"></div>
-            </div>
-
-            {/* Description Part */}
-            <div className="lg:col-span-7 p-8 md:p-12 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <span className="bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase px-3 py-1 rounded-md tracking-wider">
-                    {featuredCourse.category}
-                  </span>
-                  <span className="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold uppercase px-3 py-1 rounded-md tracking-wider">
-                    Avanzado
-                  </span>
-                </div>
-
-                <h3 className="font-display font-extrabold text-2xl md:text-4xl text-white tracking-tight">
-                  {featuredCourse.title}
-                </h3>
-
-                <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-                  {featuredCourse.subtitle}
-                </p>
-
-                <div className="flex items-center space-x-3 pt-2">
-                  <StarRating rating={featuredCourse.rating} size={18} />
-                  <span className="text-sm font-bold text-amber-400">{featuredCourse.rating}</span>
-                  <span className="text-xs text-slate-500">({featuredCourse.ratingsCount} reviews de estudiantes)</span>
-                </div>
-
-                {/* Benefits */}
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 text-xs text-slate-400">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    <span>Resolución del TSP con Algoritmos Evolutivos</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    <span>Neuroevolución e IA con Python</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    <span>Clases en video HD y recursos PDF</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    <span>Diploma digital verificado con Hash</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Purchase Box */}
-              <div className="pt-6 border-t border-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex flex-col">
-                  <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Inversión única</span>
-                  <span className="font-display font-black text-3xl text-white">${featuredCourse.price.toFixed(2)} USD</span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {isEnrolled(featuredCourse._id) ? (
-                    <Link
-                      to="/profile"
-                      className="w-full sm:w-auto btn-gradient text-white font-semibold px-6 py-3.5 rounded-xl flex items-center justify-center space-x-2"
-                    >
-                      <span>Estudiar Curso</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  ) : (
-                    <>
-                      <Link
-                        to={`/courses/${featuredCourse._id}`}
-                        className="btn-gradient-secondary text-slate-300 font-semibold px-5 py-3 rounded-xl text-sm"
-                      >
-                        Ver Programa
-                      </Link>
-
-                      {isInCart(featuredCourse._id) ? (
-                        <Link
-                          to="/cart"
-                          className="btn-gradient text-white font-semibold px-6 py-3 rounded-xl text-sm flex items-center space-x-2"
-                        >
-                          <ShoppingCart className="w-4.5 h-4.5" />
-                          <span>Ver Carrito</span>
-                        </Link>
-                      ) : (
-                        <button
-                          onClick={() => addToCart(featuredCourse)}
-                          className="btn-gradient text-white font-semibold px-6 py-3 rounded-xl text-sm flex items-center space-x-2 cursor-pointer"
-                        >
-                          <ShoppingCart className="w-4.5 h-4.5" />
-                          <span>Comprar Ahora</span>
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center text-slate-500 py-12">
-            No se encontró ningún curso destacado configurado en la base de datos.
-          </div>
-        )}
-      </section>
-
-      {/* 4. Value Propositions Section */}
-      <section className="bg-slate-950/40 py-12 border-y border-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-2 mb-16">
-            <h2 className="font-display font-bold text-3xl text-white">¿Por qué estudiar en Academia Digital Pro?</h2>
-            <p className="text-slate-400 text-sm max-w-lg mx-auto">
-              Nuestra metodología está diseñada para brindar la máxima calidad de aprendizaje e inserción laboral.
-            </p>
+              Empezar gratis <ChevronRight className="w-5 h-5" />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Educación Basada en Proyectos',
-                desc: 'Aplica cada concepto resolviendo casos prácticos reales, programando simulaciones y configurando optimizaciones desde la primera clase.',
-                icon: '🛠️',
-              },
-              {
-                title: 'Profesores Universitarios y de Industria',
-                desc: 'Aprende directamente de científicos de datos e ingenieros expertos que trabajan diariamente implementando modelos en producción.',
-                icon: '👨‍🏫',
-              },
-              {
-                title: 'Certificados Digitales Auténticos',
-                desc: 'Obtén credenciales de egresado aseguradas con hashes criptográficos que puedes enlazar directamente a tu LinkedIn o currículum.',
-                icon: '🎓',
-              },
-            ].map((prop, idx) => (
-              <div key={idx} className="glass-panel p-8 rounded-2xl space-y-4">
-                <span className="text-4xl">{prop.icon}</span>
-                <h3 className="font-display font-bold text-xl text-white">{prop.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{prop.desc}</p>
+          {/* Stats row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20 animate-fade-in-up delay-400">
+            {STATS.map(({ label, value, icon: Icon }) => (
+              <div key={label} className="stat-card text-center">
+                <Icon className="w-5 h-5 text-indigo-400 mx-auto mb-2" />
+                <div className="font-display font-extrabold text-2xl text-white">{value}</div>
+                <div className="text-xs text-slate-500 mt-0.5">{label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. Latest Catalog Preview */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
-          <div className="space-y-2">
-            <h2 className="font-display font-bold text-3xl text-white">Nuevas Incorporaciones</h2>
-            <p className="text-slate-400 text-sm max-w-lg">
-              Explora las últimas temáticas incorporadas en nuestra plataforma.
-            </p>
+      {/* ── Featured Courses ── */}
+      <section className="section">
+        <div className="container-xl">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <p className="badge-primary mb-3">⭐ Más populares</p>
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-white">
+                Cursos destacados
+              </h2>
+            </div>
+            <Link to="/courses" className="btn-outline px-5 py-2.5 rounded-xl text-sm font-semibold hidden md:flex items-center gap-2">
+              Ver todos <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
-          <Link
-            to="/courses"
-            className="text-sm font-semibold text-indigo-400 flex items-center space-x-1 hover:text-indigo-300 transition-colors group"
-          >
-            <span>Ver todo el catálogo</span>
-            <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="glass-panel h-80 rounded-2xl animate-pulse bg-slate-900/50"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {FEATURED_COURSES.map((course) => (
+              <CourseCard key={course.id} course={course} />
             ))}
           </div>
-        ) : courses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {courses.slice(0, 3).map((course) => (
-              <div key={course._id} className="glass-panel p-4 rounded-2xl flex flex-col justify-between h-full hover:border-slate-700 transition-all">
-                <div className="space-y-3">
-                  <img
-                    src={getImageUrl(course.thumbnail)}
-                    alt={course.title}
-                    className="w-full h-40 object-cover rounded-xl bg-slate-900"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded">
-                      {course.category}
-                    </span>
+
+          <div className="text-center mt-8 md:hidden">
+            <Link to="/courses" className="btn-outline px-6 py-3 rounded-xl text-sm font-semibold inline-flex items-center gap-2">
+              Ver todos los cursos <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Categories ── */}
+      <section className="section bg-[#050810]">
+        <div className="container-xl">
+          <div className="text-center mb-12">
+            <p className="badge-primary mb-3">📚 Categorías</p>
+            <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-4">
+              Explora por área
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto">
+              Encuentra el área que más te apasiona y domina las habilidades más demandadas del mercado laboral.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {CATEGORIES.map((cat) => (
+              <Link
+                key={cat.name}
+                to={`/courses?category=${encodeURIComponent(cat.name)}`}
+                className="glass-card rounded-2xl p-5 text-center group cursor-pointer"
+              >
+                <div className="text-3xl mb-3">{cat.icon}</div>
+                <div className="text-sm font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">
+                  {cat.name}
+                </div>
+                <div className="text-xs text-slate-500">{cat.count} cursos</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Features ── */}
+      <section className="section">
+        <div className="container-xl">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="badge-primary mb-4">¿Por qué elegirnos?</p>
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-6 leading-tight">
+                La mejor plataforma para impulsar tu carrera
+              </h2>
+              <p className="text-slate-400 mb-8 leading-relaxed">
+                Diseñada por profesionales de la industria para profesionales del futuro.
+                Ofrecemos la experiencia de aprendizaje más completa y efectiva.
+              </p>
+
+              <div className="space-y-6">
+                {FEATURES.map(({ icon: Icon, title, desc }) => (
+                  <div key={title} className="flex gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-semibold text-white mb-1">{title}</h3>
+                      <p className="text-sm text-slate-400">{desc}</p>
+                    </div>
                   </div>
-                  <h3 className="font-display font-bold text-base text-white line-clamp-1">{course.title}</h3>
-                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{course.subtitle}</p>
+                ))}
+              </div>
+            </div>
+
+            {/* Visual panel */}
+            <div className="relative hidden lg:block">
+              <div className="glow-orb w-80 h-80 bg-indigo-600/15 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+              <div className="glass-panel rounded-3xl p-8 relative z-10 animate-float">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
+                    <Award className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="font-display font-bold text-xl text-white">Certificado Digital</h3>
+                  <p className="text-sm text-slate-400 mt-1">Verificado y compartible</p>
                 </div>
-                <div className="border-t border-slate-900 mt-4 pt-3 flex items-center justify-between">
-                  <span className="font-display font-bold text-base text-white">${course.price} USD</span>
-                  <Link to={`/courses/${course._id}`} className="text-xs font-semibold text-indigo-400 hover:underline">
-                    Ver Curso
-                  </Link>
+                <div className="space-y-3">
+                  {['React & Node.js Full Stack', 'Python Data Science', 'UI/UX Design Pro'].map((c, i) => (
+                    <div key={c} className="flex items-center gap-3 p-3 rounded-xl bg-white/4 border border-white/6">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        {i + 1}
+                      </div>
+                      <span className="text-sm text-slate-300 font-medium">{c}</span>
+                      <span className="ml-auto badge-success">✓</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        ) : (
-          <div className="text-center text-slate-500 py-6">
-            No hay cursos catalogados en este momento.
-          </div>
-        )}
+        </div>
       </section>
-      
+
+      {/* ── CTA ── */}
+      <section className="section-sm">
+        <div className="container-xl">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-900/50 via-purple-900/30 to-slate-900 border border-indigo-500/20 p-12 text-center">
+            <div className="glow-orb w-64 h-64 bg-indigo-600/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <div className="relative z-10">
+              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white mb-4">
+                ¿Listo para empezar?
+              </h2>
+              <p className="text-slate-300 text-lg mb-8 max-w-lg mx-auto">
+                Únete a más de 50,000 estudiantes y transforma tu carrera profesional hoy mismo.
+              </p>
+              <Link
+                to="/register"
+                className="btn-gradient px-10 py-4 rounded-2xl text-white font-semibold text-base inline-flex items-center gap-2"
+              >
+                Comenzar ahora — es gratis <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-white/6 py-12 mt-8">
+        <div className="container-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-gradient-primary rounded-lg flex items-center justify-center">
+                <BookOpen className="text-white w-4 h-4" />
+              </div>
+              <span className="font-display font-bold text-white">Academia<span className="text-indigo-400">Pro</span></span>
+            </div>
+            <p className="text-xs text-slate-600">© 2026 AcademiaPro. Todos los derechos reservados.</p>
+            <div className="flex gap-5">
+              {['Privacidad', 'Términos', 'Soporte'].map((l) => (
+                <a key={l} href="#" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">{l}</a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 }
