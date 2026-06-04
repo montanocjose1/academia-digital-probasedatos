@@ -7,6 +7,7 @@ import {
   ChevronUp, ShoppingCart, CheckCircle, Award, Globe,
   Infinity, Download, Lock, ArrowLeft, Play, BarChart2
 } from 'lucide-react';
+import StarRating from '../components/Common/StarRating';
 
 // Mock data — in production this would be fetched from the API
 const COURSE_DB = {
@@ -15,7 +16,7 @@ const COURSE_DB = {
     instructor: 'Carlos Méndez', instructorBio: 'Ingeniero de Software con 10+ años de experiencia. Trabajó en startups y grandes empresas de Silicon Valley.',
     price: 49.99, rating: 4.9, students: 3241, category: 'Desarrollo Web', level: 'Intermedio',
     duration: '42h', lessons: 120, color: 'from-indigo-900 to-purple-900',
-    description: 'Aprende a construir aplicaciones web completas usando React en el frontend y Node.js + Express en el backend. Desde las bases hasta deployment en producción con Docker.',
+    description: 'Aprende a construir aplicaciones web completas usando React en el frontend and Node.js + Express en el backend. Desde las bases hasta deployment en producción con Docker.',
     whatYouLearn: [
       'Construir SPAs con React 19 y hooks modernos',
       'Crear APIs RESTful con Node.js y Express',
@@ -71,17 +72,6 @@ const DEFAULT_COURSE = {
   ],
   reviews: [],
 };
-
-function StarRating({ rating, size = 'sm' }) {
-  const s = size === 'lg' ? 'w-5 h-5' : 'w-3.5 h-3.5';
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1,2,3,4,5].map((n) => (
-        <Star key={n} className={`${s} ${n <= Math.round(rating) ? 'star-filled fill-amber-400' : 'star-empty'}`} />
-      ))}
-    </div>
-  );
-}
 
 function AccordionModule({ module, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);

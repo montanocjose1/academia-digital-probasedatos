@@ -3,6 +3,9 @@ import {
   BookOpen, ArrowRight, Star, Users, PlayCircle,
   Zap, Shield, Award, TrendingUp, ChevronRight
 } from 'lucide-react';
+import StarRating from '../components/Common/StarRating';
+import Footer from '../components/Common/Footer';
+import CourseCard from '../components/Course/CourseCard';
 
 // — Mock data —
 const FEATURED_COURSES = [
@@ -55,51 +58,7 @@ const CATEGORIES = [
   { name: 'DevOps & Cloud', icon: '☁️', count: 22 },
 ];
 
-function StarRating({ rating }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1,2,3,4,5].map((s) => (
-        <Star
-          key={s}
-          className={`w-3.5 h-3.5 ${s <= Math.round(rating) ? 'star-filled fill-amber-400' : 'star-empty'}`}
-        />
-      ))}
-    </div>
-  );
-}
 
-function CourseCard({ course }) {
-  return (
-    <Link to={`/courses/${course.id}`} className="glass-card rounded-2xl overflow-hidden block group">
-      <div className={`course-thumb bg-gradient-to-br ${course.color} flex items-center justify-center`}>
-        <BookOpen className="w-12 h-12 text-white/20 group-hover:text-white/40 transition-all group-hover:scale-110" />
-        <div className="absolute top-3 left-3">
-          <span className="badge-primary">{course.category}</span>
-        </div>
-        <div className="absolute top-3 right-3">
-          <span className="badge-warning">{course.level}</span>
-        </div>
-      </div>
-      <div className="p-5">
-        <h3 className="font-display font-semibold text-white text-sm leading-snug mb-2 line-clamp-2 group-hover:text-indigo-300 transition-colors">
-          {course.title}
-        </h3>
-        <p className="text-xs text-slate-500 mb-3">{course.instructor}</p>
-        <div className="flex items-center gap-2 mb-3">
-          <StarRating rating={course.rating} />
-          <span className="text-xs font-bold text-amber-400">{course.rating}</span>
-          <span className="text-xs text-slate-600">({course.students.toLocaleString()})</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-white">${course.price}</span>
-          <span className="text-xs text-slate-500 flex items-center gap-1">
-            <Users className="w-3.5 h-3.5" />{course.students.toLocaleString()} alumnos
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 export default function Home() {
   return (
@@ -295,24 +254,7 @@ export default function Home() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/6 py-12 mt-8">
-        <div className="container-xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <BookOpen className="text-white w-4 h-4" />
-              </div>
-              <span className="font-display font-bold text-white">Academia<span className="text-indigo-400">Pro</span></span>
-            </div>
-            <p className="text-xs text-slate-600">© 2026 AcademiaPro. Todos los derechos reservados.</p>
-            <div className="flex gap-5">
-              {['Privacidad', 'Términos', 'Soporte'].map((l) => (
-                <a key={l} href="#" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">{l}</a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
     </div>
   );

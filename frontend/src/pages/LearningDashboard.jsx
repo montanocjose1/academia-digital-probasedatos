@@ -123,7 +123,7 @@ function ModuleAccordion({ module }) {
   );
 }
 
-function CourseCard({ course, onSelect, selected }) {
+function EnrolledCourseCard({ course, onSelect, selected }) {
   return (
     <div
       onClick={() => onSelect(course)}
@@ -230,7 +230,7 @@ export default function LearningDashboard() {
 
             <div className="space-y-3">
               {filtered.map((course) => (
-                <CourseCard
+                <EnrolledCourseCard
                   key={course._id}
                   course={course}
                   onSelect={setSelectedCourse}

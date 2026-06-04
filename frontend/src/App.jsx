@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 
 import Navbar from './components/Common/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
@@ -23,10 +24,10 @@ function App() {
         <Route path="/courses/:id" element={<CourseDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/learning" element={<LearningDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/learning" element={<ProtectedRoute><LearningDashboard /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
       </Routes>
     </>
   );
