@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import {
   BookOpen, ShoppingCart, User, Menu, X, LogOut,
-  LayoutDashboard, ChevronDown, Settings, GraduationCap
+  LayoutDashboard, ChevronDown, Settings, GraduationCap, Dna
 } from 'lucide-react';
 
 
@@ -68,6 +68,14 @@ export default function Navbar() {
             }`}
           >
             Cursos
+          </Link>
+          <Link
+            to="/ga-lab"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+              isActive('/ga-lab') ? 'text-white bg-white/5' : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Dna className="w-3.5 h-3.5" /> GA Lab
           </Link>
           {user && (
             <Link
@@ -164,6 +172,7 @@ export default function Navbar() {
           <div className="container-xl py-4 flex flex-col gap-1">
             <Link to="/" className="sidebar-link">Inicio</Link>
             <Link to="/courses" className="sidebar-link">Cursos</Link>
+            <Link to="/ga-lab" className="sidebar-link"><Dna className="w-4 h-4" /> GA Lab</Link>
             {user ? (
               <>
                 <Link to="/learning" className="sidebar-link"><GraduationCap className="w-4 h-4" /> Mi Aprendizaje</Link>

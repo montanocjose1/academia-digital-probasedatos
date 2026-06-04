@@ -12,6 +12,7 @@ import CartPage from './pages/CartPage';
 import CourseDetail from './pages/CourseDetail';
 import LearningDashboard from './pages/LearningDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import GALab from './pages/GALab';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/learning" element={<ProtectedRoute><LearningDashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/ga-lab" element={<GALab />} />
       </Routes>
     </>
   );
