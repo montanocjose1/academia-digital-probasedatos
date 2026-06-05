@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagrama Entidad-Relación - Academia Digital Pro</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a1a; color: #e0e0e0; padding: 40px; }
+  h1 { color: #00d4ff; text-align: center; margin-bottom: 10px; font-size: 2.2em; }
+  .subtitle { text-align: center; color: #8892b0; margin-bottom: 40px; }
+  .er-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: 1400px; margin: 0 auto; }
+  .entity { background: #13132b; border: 1px solid #1e3a5f; border-radius: 12px; padding: 20px; width: 280px; box-shadow: 0 0 30px rgba(0, 212, 255, 0.05); }
+  .entity-header { background: linear-gradient(135deg, #00d4ff, #0077be); margin: -20px -20px 15px -20px; padding: 15px 20px; border-radius: 12px 12px 0 0; color: #fff; font-weight: bold; font-size: 1.1em; display: flex; align-items: center; gap: 10px; }
+  .entity-header .icon { font-size: 1.3em; }
+  .entity-table { width: 100%; border-collapse: collapse; }
+  .entity-table th { text-align: left; color: #00d4ff; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 0; border-bottom: 1px solid #1e3a5f; }
+  .entity-table td { padding: 6px 0; font-size: 0.85em; border-bottom: 1px solid #1a1a3a; }
+  .entity-table tr:last-child td { border: none; }
+  .pk { color: #ffd700; font-weight: bold; }
+  .fk { color: #ff6b6b; }
+  .nn { color: #ff6b6b; font-size: 0.7em; margin-left: 4px; }
+  .type { color: #8892b0; font-size: 0.8em; display: block; }
+  .relation-line { text-align: center; margin: 10px 0; }
+  .relation-arrow { color: #00d4ff; font-size: 0.7em; }
+  .section-title { text-align: center; margin: 50px 0 30px; color: #00d4ff; font-size: 1.5em; }
+  .relationship-list { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+  .relationship-card { background: #13132b; border: 1px solid #1e3a5f; border-radius: 8px; padding: 15px; }
+  .relationship-card h3 { color: #ffd700; margin-bottom: 8px; font-size: 0.95em; }
+  .relationship-card p { color: #b0b8d0; font-size: 0.85em; line-height: 1.4; }
+  .entity-desc { max-width: 1000px; margin: 20px auto 40px; }
+  .entity-desc table { width: 100%; border-collapse: collapse; }
+  .entity-desc th { background: #1a1a3a; color: #00d4ff; padding: 12px; text-align: left; border-bottom: 2px solid #1e3a5f; }
+  .entity-desc td { padding: 10px 12px; border-bottom: 1px solid #1a1a3a; font-size: 0.9em; }
+  .entity-desc tr:hover { background: #0f0f25; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; }
+  .tag-pk { background: #ffd70033; color: #ffd700; }
+  .tag-fk { background: #ff6b6b33; color: #ff6b6b; }
+  .footer { text-align: center; margin-top: 60px; color: #8892b0; font-size: 0.85em; }
+</style>
+</head>
+<body>
+  <h1>🧬 Academia Digital Pro</h1>
+  <p class="subtitle">Diagrama Entidad-Relación del Sistema de Base de Datos</p>
+
+  <div class="er-container">
+    <!-- usuarios -->
+    <div class="entity"><div class="entity-header"><span class="icon">👤</span> usuarios</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td>nombre <span class="nn">NOT NULL</span></td><td><span class="type">VARCHAR(150)</span></td></tr>
+      <tr><td>email <span class="nn">UNIQUE</span></td><td><span class="type">VARCHAR(255)</span></td></tr>
+      <tr><td>password_hash</td><td><span class="type">VARCHAR(255)</span></td></tr>
+      <tr><td>rol</td><td><span class="type">VARCHAR(20)</span></td></tr>
+      <tr><td>avatar_url</td><td><span class="type">VARCHAR(500)</span></td></tr>
+      <tr><td>bio</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>verified</td><td><span class="type">BOOLEAN</span></td></tr>
+      <tr><td>activo</td><td><span class="type">BOOLEAN</span></td></tr>
+      <tr><td>ultimo_acceso</td><td><span class="type">TIMESTAMP</span></td></tr>
+      <tr><td>reset_token</td><td><span class="type">VARCHAR(255)</span></td></tr>
+      <tr><td>created_at</td><td><span class="type">TIMESTAMP</span></td></tr>
+    </table></div>
+
+    <!-- cursos -->
+    <div class="entity"><div class="entity-header"><span class="icon">📚</span> cursos</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td>titulo</td><td><span class="type">VARCHAR(200)</span></td></tr>
+      <tr><td>slug <span class="nn">UNIQUE</span></td><td><span class="type">VARCHAR(255)</span></td></tr>
+      <tr><td>descripcion_corta</td><td><span class="type">VARCHAR(300)</span></td></tr>
+      <tr><td>descripcion_larga</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>precio</td><td><span class="type">DECIMAL(10,2)</span></td></tr>
+      <tr><td>nivel</td><td><span class="type">VARCHAR(20)</span></td></tr>
+      <tr><td><span class="fk">categoria_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td><span class="fk">instructor_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>portada_url</td><td><span class="type">VARCHAR(500)</span></td></tr>
+      <tr><td>rating</td><td><span class="type">DECIMAL(2,1)</span></td></tr>
+      <tr><td>publicado</td><td><span class="type">BOOLEAN</span></td></tr>
+    </table></div>
+
+    <!-- categorias -->
+    <div class="entity"><div class="entity-header"><span class="icon">🏷️</span> categorias</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td>nombre <span class="nn">UNIQUE</span></td><td><span class="type">VARCHAR(100)</span></td></tr>
+      <tr><td>descripcion</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>icono</td><td><span class="type">VARCHAR(50)</span></td></tr>
+      <tr><td>created_at</td><td><span class="type">TIMESTAMP</span></td></tr>
+    </table></div>
+
+    <!-- capitulos -->
+    <div class="entity"><div class="entity-header"><span class="icon">📖</span> capitulos</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">curso_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>titulo</td><td><span class="type">VARCHAR(200)</span></td></tr>
+      <tr><td>descripcion</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>orden</td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>duracion_estimada</td><td><span class="type">INTEGER</span></td></tr>
+    </table></div>
+
+    <!-- lecciones -->
+    <div class="entity"><div class="entity-header"><span class="icon">📝</span> lecciones</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">capitulo_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>titulo</td><td><span class="type">VARCHAR(200)</span></td></tr>
+      <tr><td>contenido_texto</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>codigo_ejemplo</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>tipo</td><td><span class="type">VARCHAR(30)</span></td></tr>
+      <tr><td>video_url</td><td><span class="type">VARCHAR(500)</span></td></tr>
+      <tr><td>es_gratuito</td><td><span class="type">BOOLEAN</span></td></tr>
+    </table></div>
+
+    <!-- recursos_multimedia -->
+    <div class="entity"><div class="entity-header"><span class="icon">🎬</span> recursos_multimedia</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">leccion_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>titulo</td><td><span class="type">VARCHAR(200)</span></td></tr>
+      <tr><td>tipo</td><td><span class="type">VARCHAR(30)</span></td></tr>
+      <tr><td>url</td><td><span class="type">VARCHAR(500)</span></td></tr>
+      <tr><td>descripcion</td><td><span class="type">TEXT</span></td></tr>
+    </table></div>
+
+    <!-- progreso_estudiante -->
+    <div class="entity"><div class="entity-header"><span class="icon">📊</span> progreso_estudiante</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">usuario_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td><span class="fk">leccion_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>completado</td><td><span class="type">BOOLEAN</span></td></tr>
+      <tr><td>puntuacion</td><td><span class="type">DECIMAL(5,2)</span></td></tr>
+      <tr><td>intentos</td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>fecha_completado</td><td><span class="type">TIMESTAMP</span></td></tr>
+    </table></div>
+
+    <!-- evaluaciones -->
+    <div class="entity"><div class="entity-header"><span class="icon">❓</span> evaluaciones</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">leccion_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>pregunta</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>opciones</td><td><span class="type">JSONB</span></td></tr>
+      <tr><td>respuesta_correcta</td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>explicacion</td><td><span class="type">TEXT</span></td></tr>
+    </table></div>
+
+    <!-- inscripciones -->
+    <div class="entity"><div class="entity-header"><span class="icon">📋</span> inscripciones</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">usuario_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td><span class="fk">curso_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>fecha_inscripcion</td><td><span class="type">TIMESTAMP</span></td></tr>
+      <tr><td>fecha_completado</td><td><span class="type">TIMESTAMP</span></td></tr>
+      <tr><td>progreso</td><td><span class="type">DECIMAL(5,2)</span></td></tr>
+      <tr><td>certificado_url</td><td><span class="type">VARCHAR(500)</span></td></tr>
+    </table></div>
+
+    <!-- repositorios_github -->
+    <div class="entity"><div class="entity-header"><span class="icon">🐙</span> repositorios_github</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">usuario_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td><span class="fk">curso_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>nombre</td><td><span class="type">VARCHAR(200)</span></td></tr>
+      <tr><td>url_repositorio</td><td><span class="type">VARCHAR(500)</span></td></tr>
+      <tr><td>descripcion</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>commits_ejemplo</td><td><span class="type">TEXT[]</span></td></tr>
+    </table></div>
+
+    <!-- foro_preguntas -->
+    <div class="entity"><div class="entity-header"><span class="icon">💬</span> foro_preguntas</div>
+    <table class="entity-table">
+      <tr><th>columna</th><th>tipo</th></tr>
+      <tr><td><span class="pk">id</span> <span class="nn">PK</span></td><td><span class="type">SERIAL</span></td></tr>
+      <tr><td><span class="fk">curso_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td><span class="fk">usuario_id</span> <span class="tag tag-fk">FK</span></td><td><span class="type">INTEGER</span></td></tr>
+      <tr><td>titulo</td><td><span class="type">VARCHAR(200)</span></td></tr>
+      <tr><td>contenido</td><td><span class="type">TEXT</span></td></tr>
+      <tr><td>resuelto</td><td><span class="type">BOOLEAN</span></td></tr>
+    </table></div>
+  </div>
+
+  <h2 class="section-title">🔗 Relaciones entre Tablas</h2>
+  <div class="relationship-list">
+    <div class="relationship-card"><h3>categorias → cursos</h3><p>Una categoría puede tener <strong>muchos</strong> cursos. Un curso pertenece a <strong>una</strong> categoría. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>usuarios → cursos (instructor)</h3><p>Un usuario (instructor) puede crear <strong>muchos</strong> cursos. Un curso tiene <strong>un</strong> instructor. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>cursos → capitulos</h3><p>Un curso tiene <strong>muchos</strong> capítulos. Un capítulo pertenece a <strong>un</strong> curso. Relación <strong>1:N</strong> con borrado en cascada.</p></div>
+    <div class="relationship-card"><h3>capitulos → lecciones</h3><p>Un capítulo tiene <strong>muchas</strong> lecciones. Una lección pertenece a <strong>un</strong> capítulo. Relación <strong>1:N</strong> con borrado en cascada.</p></div>
+    <div class="relationship-card"><h3>lecciones → recursos_multimedia</h3><p>Una lección puede tener <strong>muchos</strong> recursos multimedia. Cada recurso pertenece a <strong>una</strong> lección. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>lecciones → evaluaciones</h3><p>Una lección puede tener <strong>muchas</strong> preguntas de evaluación. Cada evaluación pertenece a <strong>una</strong> lección. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>usuarios → progreso_estudiante</h3><p>Un usuario tiene <strong>muchos</strong> registros de progreso. Cada progreso pertenece a <strong>un</strong> usuario. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>lecciones → progreso_estudiante</h3><p>Una lección puede tener <strong>muchos</strong> registros de progreso (de diferentes estudiantes). Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>usuarios → inscripciones</h3><p>Un usuario puede tener <strong>muchas</strong> inscripciones a cursos. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>cursos → inscripciones</h3><p>Un curso puede tener <strong>muchas</strong> inscripciones de estudiantes. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>usuarios → repositorios_github</h3><p>Un usuario puede tener <strong>muchos</strong> repositorios GitHub asociados. Relación <strong>1:N</strong>.</p></div>
+    <div class="relationship-card"><h3>cursos → repositorios_github</h3><p>Un curso puede tener <strong>muchos</strong> repositorios asociados. Relación <strong>1:N</strong>.</p></div>
+  </div>
+
+  <h2 class="section-title">📖 Descripción de Tablas</h2>
+  <div class="entity-desc">
+    <table>
+      <tr><th>Tabla</th><th>Descripción</th></tr>
+      <tr><td><strong>categorias</strong></td><td>Clasificación temática de los cursos (IA, Programación, Datos, etc.)</td></tr>
+      <tr><td><strong>usuarios</strong></td><td>Información de todos los usuarios del sistema: estudiantes, instructores y administradores</td></tr>
+      <tr><td><strong>cursos</strong></td><td>Cursos ofertados en la plataforma con metadatos (precio, nivel, rating)</td></tr>
+      <tr><td><strong>capitulos</strong></td><td>Módulos o unidades que componen cada curso</td></tr>
+      <tr><td><strong>lecciones</strong></td><td>Unidades de aprendizaje individuales dentro de cada capítulo</td></tr>
+      <tr><td><strong>recursos_multimedia</strong></td><td>Material complementario: imágenes, videos, diagramas, animaciones</td></tr>
+      <tr><td><strong>inscripciones</strong></td><td>Registro de estudiantes inscritos en cursos con su progreso</td></tr>
+      <tr><td><strong>progreso_estudiante</strong></td><td>Seguimiento detallado del avance del estudiante en cada lección</td></tr>
+      <tr><td><strong>evaluaciones</strong></td><td>Preguntas de opción múltiple para evaluar el aprendizaje</td></tr>
+      <tr><td><strong>respuestas_estudiante</strong></td><td>Respuestas enviadas por estudiantes a las evaluaciones</td></tr>
+      <tr><td><strong>repositorios_github</strong></td><td>Enlaces a repositorios GitHub asociados a cursos y proyectos</td></tr>
+      <tr><td><strong>foro_preguntas</strong></td><td>Preguntas del foro de discusión de cada curso</td></tr>
+      <tr><td><strong>foro_respuestas</strong></td><td>Respuestas a las preguntas del foro</td></tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>Academia Digital Pro &copy; 2026 - Documentación de Base de Datos v1.0</p>
+    <p>PostgreSQL 16+ | Esquema: academia | 13 tablas, 4 índices, 2 triggers, 2 funciones</p>
+  </div>
+</body>
+</html>

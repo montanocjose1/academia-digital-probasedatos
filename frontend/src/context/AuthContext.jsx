@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
+import api from '../config/api';
 
 const AuthContext = createContext();
 
@@ -7,92 +8,71 @@ export const AuthProvider = ({ children }) => {
     try {
       const savedUser = localStorage.getItem('user');
       return savedUser ? JSON.parse(savedUser) : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   });
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) return { success: false, message: data.message || 'Error al iniciar sesión' };
-      
-      setUser(data.user);
+      const data = await api.login({ email, password });
+      setUser(data.usuario);
       setToken(data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('user', JSON.stringify(data.usuario));
       localStorage.setItem('token', data.token);
       return { success: true };
-    } catch {
-      console.warn('Backend server not reached. Logging in via Demo Mode.');
-      
-      // Simple logic to set roles based on email keywords for demo purposes
+    } catch (err) {
       const nameFromEmail = email.split('@')[0];
       const displayName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
       const demoUser = {
-        _id: 'demo-user-123',
-        name: displayName || 'Usuario Demo',
-        email: email,
-        role: email.toLowerCase().includes('admin') ? 'admin' : email.toLowerCase().includes('instructor') ? 'instructor' : 'student',
+        id: 'demo-user-123', nombre: displayName || 'Usuario Demo',
+        email, rol: email.toLowerCase().includes('admin') ? 'admin'
+          : email.toLowerCase().includes('instructor') ? 'instructor' : 'estudiante',
       };
       const demoToken = 'demo-jwt-token-123456789';
-
       setUser(demoUser);
       setToken(demoToken);
       localStorage.setItem('user', JSON.stringify(demoUser));
       localStorage.setItem('token', demoToken);
-      return { success: true };
+      return { success: true, demo: true };
     }
-  };
+  }, []);
 
-  const register = async (name, email, password, role) => {
+  const register = useCallback(async (nombre, email, password, rol) => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role }),
-      });
-      const data = await res.json();
-      if (!res.ok) return { success: false, message: data.message || 'Error al registrar' };
-      
-      setUser(data.user);
+      const data = await api.register({ nombre, email, password, rol: rol || 'estudiante' });
+      setUser(data.usuario);
       setToken(data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('user', JSON.stringify(data.usuario));
       localStorage.setItem('token', data.token);
       return { success: true };
-    } catch {
-      console.warn('Backend server not reached. Registering via Demo Mode.');
-      
+    } catch (err) {
       const demoUser = {
-        _id: 'demo-user-' + Math.random().toString(36).substr(2, 9),
-        name: name,
-        email: email,
-        role: role,
+        id: 'demo-user-' + Math.random().toString(36).substr(2, 9),
+        nombre, email, rol: rol || 'estudiante',
       };
       const demoToken = 'demo-jwt-token-' + Math.random().toString(36).substr(2, 9);
-
       setUser(demoUser);
       setToken(demoToken);
       localStorage.setItem('user', JSON.stringify(demoUser));
       localStorage.setItem('token', demoToken);
-      return { success: true };
+      return { success: true, demo: true };
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-  };
+  }, []);
+
+  const updateUser = useCallback((userData) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
