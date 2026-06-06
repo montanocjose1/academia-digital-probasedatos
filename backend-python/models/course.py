@@ -91,6 +91,7 @@ class Capitulo(db.Model):
     curso_id = db.Column(db.Integer, db.ForeignKey('academia.cursos.id'), nullable=False)
     titulo = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.Text)
+    video_url = db.Column(db.String(500))
     orden = db.Column(db.Integer, nullable=False)
     duracion_estimada = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -105,6 +106,7 @@ class Capitulo(db.Model):
             'curso_id': self.curso_id,
             'titulo': self.titulo,
             'descripcion': self.descripcion,
+            'video_url': self.video_url,
             'orden': self.orden,
             'duracion_estimada': self.duracion_estimada,
         }

@@ -101,6 +101,7 @@ CREATE TABLE capitulos (
     curso_id INTEGER NOT NULL REFERENCES cursos(id) ON DELETE CASCADE,
     titulo VARCHAR(200) NOT NULL,
     descripcion TEXT,
+    video_url VARCHAR(500), -- URL de YouTube para el capítulo
     orden INTEGER NOT NULL,
     duracion_estimada INTEGER, -- en minutos
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -416,16 +417,16 @@ VALUES (
     ARRAY['Comprender los fundamentos biológicos de los AG', 'Implementar AG desde cero en Python', 'Resolver problemas de optimización con AG', 'Desarrollar un proyecto práctico completo']
 );
 
--- Capítulos del curso
-INSERT INTO capitulos (curso_id, titulo, descripcion, orden, duracion_estimada) VALUES
-    (1, 'Introducción a los Algoritmos Genéticos', 'Historia, fundamentos y aplicaciones de los Algoritmos Genéticos en la computación evolutiva.', 1, 90),
-    (1, 'Conceptos Fundamentales', 'Genes, cromosomas, individuos y población: la base biológica de los AG.', 2, 120),
-    (1, 'Función Fitness', 'Diseño y cálculo de funciones de aptitud para evaluar soluciones.', 3, 150),
-    (1, 'Selección', 'Métodos de selección: ruleta, torneo, rango y elitismo.', 4, 150),
-    (1, 'Cruce (Crossover)', 'Operadores de cruce: 1-punto, 2-puntos, uniforme y otros.', 5, 150),
-    (1, 'Mutación', 'Operadores de mutación y su importancia en la diversidad genética.', 6, 120),
-    (1, 'Implementación Completa en Python', 'Construcción paso a paso de un AG completo y optimizado.', 7, 180),
-    (1, 'Proyecto Práctico Final', 'Aplicación de AG a un problema real de optimización.', 8, 240);
+-- Capítulos del curso (con videos reales de YouTube sobre AG)
+INSERT INTO capitulos (curso_id, titulo, descripcion, video_url, orden, duracion_estimada) VALUES
+    (1, 'Introducción a los Algoritmos Genéticos', 'Historia, fundamentos y aplicaciones de los Algoritmos Genéticos en la computación evolutiva.', 'https://www.youtube.com/embed/XP8R0tRZcGQ', 1, 90),
+    (1, 'Conceptos Fundamentales', 'Genes, cromosomas, individuos y población: la base biológica de los AG.', 'https://www.youtube.com/embed/kHyNqSnzP8Y', 2, 120),
+    (1, 'Función Fitness', 'Diseño y cálculo de funciones de aptitud para evaluar soluciones.', 'https://www.youtube.com/embed/uQj5UNh8dZg', 3, 150),
+    (1, 'Selección', 'Métodos de selección: ruleta, torneo, rango y elitismo.', 'https://www.youtube.com/embed/Gs9JfDQIhUQ', 4, 150),
+    (1, 'Cruce (Crossover)', 'Operadores de cruce: 1-punto, 2-puntos, uniforme y otros.', 'https://www.youtube.com/embed/9zqJZgG6VVM', 5, 150),
+    (1, 'Mutación', 'Operadores de mutación y su importancia en la diversidad genética.', 'https://www.youtube.com/embed/9Z9mkw1Wj9A', 6, 120),
+    (1, 'Implementación Completa en Python', 'Construcción paso a paso de un AG completo y optimizado.', 'https://www.youtube.com/embed/GM9i9TZ8w5A', 7, 180),
+    (1, 'Proyecto Práctico Final', 'Aplicación de AG a un problema real de optimización.', 'https://www.youtube.com/embed/Qkp9iis_V_s', 8, 240);
 
 -- Lecciones del Módulo 1: Introducción
 INSERT INTO lecciones (capitulo_id, titulo, contenido_texto, codigo_ejemplo, tipo, orden, duracion_estimada, video_url, es_gratuito) VALUES

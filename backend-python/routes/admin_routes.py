@@ -108,6 +108,7 @@ def add_capitulo(curso_id):
         curso_id=curso_id,
         titulo=data['titulo'],
         descripcion=data.get('descripcion', ''),
+        video_url=data.get('video_url', ''),
         orden=data.get('orden', (max_orden or 0) + 1),
         duracion_estimada=data.get('duracion_estimada'),
     )

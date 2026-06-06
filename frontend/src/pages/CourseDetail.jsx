@@ -13,10 +13,10 @@ import StarRating from '../components/Common/StarRating';
 const COURSE_DB = {
   '1': {
     _id: '1', title: 'React & Node.js: Full Stack desde Cero',
-    instructor: 'Carlos Méndez', instructorBio: 'Ingeniero de Software con 10+ años de experiencia. Trabajó en startups y grandes empresas de Silicon Valley.',
+    instructor: 'Carlos Méndez', instructorBio: 'Ingeniero de Software con 10+ años de experiencia.',
     price: 49.99, rating: 4.9, students: 3241, category: 'Desarrollo Web', level: 'Intermedio',
     duration: '42h', lessons: 120, color: 'from-indigo-900 to-purple-900',
-    description: 'Aprende a construir aplicaciones web completas usando React en el frontend and Node.js + Express en el backend. Desde las bases hasta deployment en producción con Docker.',
+    description: 'Aprende a construir aplicaciones web completas usando React en el frontend y Node.js + Express en el backend.',
     whatYouLearn: [
       'Construir SPAs con React 19 y hooks modernos',
       'Crear APIs RESTful con Node.js y Express',
@@ -27,36 +27,51 @@ const COURSE_DB = {
     ],
     requirements: ['Conocimientos básicos de HTML, CSS y JavaScript', 'Computadora con Node.js instalado', 'Ganas de aprender'],
     modules: [
-      { id: 1, title: 'Fundamentos de React', lessons: [
-        { id: 1, title: 'Introducción al curso', duration: '5:20', free: true },
-        { id: 2, title: '¿Qué es React?', duration: '8:15', free: true },
-        { id: 3, title: 'JSX y componentes', duration: '12:40', free: false },
-        { id: 4, title: 'Props y State', duration: '18:00', free: false },
-      ]},
-      { id: 2, title: 'Hooks modernos', lessons: [
-        { id: 5, title: 'useState y useEffect', duration: '22:30', free: false },
-        { id: 6, title: 'useContext y useRef', duration: '18:45', free: false },
-        { id: 7, title: 'Custom Hooks', duration: '25:10', free: false },
-      ]},
-      { id: 3, title: 'Backend con Node.js', lessons: [
-        { id: 8, title: 'Express y rutas', duration: '20:00', free: false },
-        { id: 9, title: 'Middleware y autenticación', duration: '30:15', free: false },
-        { id: 10, title: 'Base de datos con MongoDB', duration: '35:00', free: false },
-      ]},
-      { id: 4, title: 'Proyecto Final y Despliegue', lessons: [
-        { id: 11, title: 'Construyendo el proyecto', duration: '45:00', free: false },
-        { id: 12, title: 'Deploy con Docker', duration: '28:20', free: false },
-      ]},
+      {
+        id: 1, title: 'Fundamentos de React',
+        video_url: 'https://www.youtube.com/embed/dGcsHMXbSOA',
+        lessons: [
+          { id: 1, title: 'Introducción al curso', duration: '5:20', free: true },
+          { id: 2, title: '¿Qué es React?', duration: '8:15', free: true },
+          { id: 3, title: 'JSX y componentes', duration: '12:40', free: false },
+          { id: 4, title: 'Props y State', duration: '18:00', free: false },
+        ]
+      },
+      {
+        id: 2, title: 'Hooks modernos',
+        video_url: 'https://www.youtube.com/embed/9KH4iG-4E_g',
+        lessons: [
+          { id: 5, title: 'useState y useEffect', duration: '22:30', free: false },
+          { id: 6, title: 'useContext y useRef', duration: '18:45', free: false },
+          { id: 7, title: 'Custom Hooks', duration: '25:10', free: false },
+        ]
+      },
+      {
+        id: 3, title: 'Backend con Node.js',
+        video_url: '',
+        lessons: [
+          { id: 8, title: 'Express y rutas', duration: '20:00', free: false },
+          { id: 9, title: 'Middleware y autenticación', duration: '30:15', free: false },
+          { id: 10, title: 'Base de datos con MongoDB', duration: '35:00', free: false },
+        ]
+      },
+      {
+        id: 4, title: 'Proyecto Final y Despliegue',
+        video_url: null,
+        lessons: [
+          { id: 11, title: 'Construyendo el proyecto', duration: '45:00', free: false },
+          { id: 12, title: 'Deploy con Docker', duration: '28:20', free: false },
+        ]
+      },
     ],
     reviews: [
-      { id: 1, user: 'María González', avatar: 'M', rating: 5, comment: 'Excelente curso, muy completo y bien explicado. Carlos tiene una manera única de enseñar.', date: 'Hace 2 semanas' },
-      { id: 2, user: 'Pedro Ramírez', avatar: 'P', rating: 5, comment: 'Pasé de saber solo HTML a construir aplicaciones full stack. Increíble.', date: 'Hace 1 mes' },
-      { id: 3, user: 'Laura Díaz', avatar: 'L', rating: 4, comment: 'Muy bueno, aunque alguna sección podría tener más ejercicios prácticos.', date: 'Hace 2 meses' },
+      { id: 1, user: 'María González', avatar: 'M', rating: 5, comment: 'Excelente curso, muy completo y bien explicado.', date: 'Hace 2 semanas' },
+      { id: 2, user: 'Pedro Ramírez', avatar: 'P', rating: 5, comment: 'Pasé de saber solo HTML a construir aplicaciones full stack.', date: 'Hace 1 mes' },
+      { id: 3, user: 'Laura Díaz', avatar: 'L', rating: 4, comment: 'Muy bueno, aunque alguna sección podría tener más ejercicios.', date: 'Hace 2 meses' },
     ],
   },
 };
 
-// Default course data for routes not in mock DB
 const DEFAULT_COURSE = {
   title: 'Curso Profesional', instructor: 'Instructor', price: 49.99, rating: 4.8,
   students: 1500, category: 'General', level: 'Principiante', duration: '30h', lessons: 80,
@@ -65,7 +80,7 @@ const DEFAULT_COURSE = {
   whatYouLearn: ['Conceptos fundamentales', 'Proyectos prácticos', 'Certificado al finalizar'],
   requirements: ['Ganas de aprender'],
   modules: [
-    { id: 1, title: 'Introducción', lessons: [
+    { id: 1, title: 'Introducción', video_url: '', lessons: [
       { id: 1, title: 'Bienvenida al curso', duration: '5:00', free: true },
       { id: 2, title: 'Configuración del entorno', duration: '10:00', free: false },
     ]},
@@ -73,36 +88,91 @@ const DEFAULT_COURSE = {
   reviews: [],
 };
 
+function YoutubeEmbed({ url }) {
+  if (!url || url.trim() === '') return null;
+
+  const getEmbedUrl = (input) => {
+    if (!input) return null;
+    const trimmed = input.trim();
+
+    // Ya es embed
+    if (trimmed.includes('/embed/')) return trimmed;
+
+    // youtube.com/watch?v=ID
+    const watchMatch = trimmed.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+
+    // Solo el ID
+    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return `https://www.youtube.com/embed/${trimmed}`;
+
+    return null;
+  };
+
+  const embedUrl = getEmbedUrl(url);
+  if (!embedUrl) return null;
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-black/40 my-4" style={{ aspectRatio: '16/9' }}>
+      <iframe
+        src={embedUrl}
+        title="YouTube video player"
+        className="absolute top-0 left-0 w-full h-full"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  );
+}
+
 function AccordionModule({ module, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
+  const hasVideo = module.video_url && module.video_url.trim() !== '';
+
   return (
     <div className="accordion-item">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-5 py-4 text-left"
       >
-        <div>
-          <h4 className="font-display font-semibold text-white text-sm">{module.title}</h4>
-          <p className="text-xs text-slate-500 mt-0.5">{module.lessons.length} lecciones</p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h4 className="font-display font-semibold text-white text-sm">{module.title}</h4>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {module.lessons.length} lecciones
+              {hasVideo && <span className="ml-2 inline-flex items-center gap-1 text-indigo-400">· <PlayCircle className="w-3 h-3" /> Video</span>}
+            </p>
+          </div>
         </div>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>
 
       {open && (
-        <div className="border-t border-white/5 divide-y divide-white/5">
-          {module.lessons.map((lesson) => (
-            <div key={lesson.id} className="flex items-center gap-3 px-5 py-3">
-              {lesson.free
-                ? <Play className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                : <Lock className="w-4 h-4 text-slate-600 flex-shrink-0" />
-              }
-              <span className={`flex-1 text-sm ${lesson.free ? 'text-slate-300' : 'text-slate-500'}`}>
-                {lesson.title}
-                {lesson.free && <span className="ml-2 badge-primary text-[10px]">Gratis</span>}
-              </span>
-              <span className="text-xs text-slate-600">{lesson.duration}</span>
-            </div>
-          ))}
+        <div className="border-t border-white/5">
+          {/* YouTube video embed */}
+          {hasVideo
+            ? <YoutubeEmbed url={module.video_url} />
+            : <div className="flex items-center gap-2 px-5 py-4 text-sm text-slate-500">
+                <PlayCircle className="w-4 h-4 text-slate-600" />
+                Este capítulo aún no tiene video disponible
+              </div>
+          }
+
+          <div className="divide-y divide-white/5">
+            {module.lessons.map((lesson) => (
+              <div key={lesson.id} className="flex items-center gap-3 px-5 py-3">
+                {lesson.free
+                  ? <Play className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                  : <Lock className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                }
+                <span className={`flex-1 text-sm ${lesson.free ? 'text-slate-300' : 'text-slate-500'}`}>
+                  {lesson.title}
+                  {lesson.free && <span className="ml-2 badge-primary text-[10px]">Gratis</span>}
+                </span>
+                <span className="text-xs text-slate-600">{lesson.duration}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -187,7 +257,6 @@ export default function CourseDetail() {
             {/* Overview */}
             {activeTab === 'overview' && (
               <div className="animate-fade-in space-y-8">
-                {/* What you'll learn */}
                 <div className="glass-panel rounded-2xl p-6">
                   <h2 className="font-display font-bold text-xl text-white mb-5">Lo que aprenderás</h2>
                   <div className="grid md:grid-cols-2 gap-3">
@@ -200,7 +269,6 @@ export default function CourseDetail() {
                   </div>
                 </div>
 
-                {/* Requirements */}
                 <div>
                   <h2 className="font-display font-bold text-xl text-white mb-4">Requisitos</h2>
                   <ul className="space-y-2">
@@ -212,7 +280,6 @@ export default function CourseDetail() {
                   </ul>
                 </div>
 
-                {/* Instructor */}
                 <div>
                   <h2 className="font-display font-bold text-xl text-white mb-4">Tu instructor</h2>
                   <div className="flex items-start gap-4">
@@ -284,7 +351,6 @@ export default function CourseDetail() {
           {/* Sidebar — purchase card */}
           <div className="lg:w-80 flex-shrink-0">
             <div className="glass-panel rounded-3xl overflow-hidden sticky top-24">
-              {/* Preview thumb */}
               <div className={`course-thumb bg-gradient-to-br ${course.color} flex items-center justify-center`} style={{ borderRadius: 0 }}>
                 <div className="text-center">
                   <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-3 border border-white/20">
@@ -324,7 +390,6 @@ export default function CourseDetail() {
 
                 <p className="text-center text-xs text-slate-500 mb-6">Garantía de devolución de 30 días</p>
 
-                {/* Includes */}
                 <div className="space-y-2.5">
                   <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Este curso incluye:</h4>
                   {[
